@@ -24,15 +24,36 @@ export default function Home() {
     async function syncFromRemote() {
       const remoteData = await loadDataFromRemote();
       if (remoteData) {
+        // Remote data exists, use it
         setData(remoteData);
         saveData(remoteData, true); // Update localStorage cache, skip re-uploading
         setSyncStatus('synced');
+      } else if (data) {
+        // Remote is empty but we have local data, push it to remote
+        await (async () => {
+          try {
+            const res = await fetch('/api/data', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            });
+            if (res.ok) {
+              setSyncStatus('synced');
+            } else {
+              setSyncStatus('offline');
+            }
+          } catch {
+            setSyncStatus('offline');
+          }
+        })();
       } else {
         setSyncStatus('offline');
       }
     }
-    syncFromRemote();
-  }, []);
+    if (data) {
+      syncFromRemote();
+    }
+  }, [data]);
 
   function updateData(newData: AppData) {
     setData(newData);

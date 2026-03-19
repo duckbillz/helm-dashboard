@@ -203,7 +203,10 @@ export async function loadDataFromRemote(): Promise<AppData | null> {
     if (!data) return null;
     // data may come back as a string (from Redis) or as an object
     const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-    if (parsed && parsed.objectives) return parsed as AppData;
+    // Return the data if it has the expected shape (at least has objectives array)
+    if (parsed && typeof parsed === 'object' && Array.isArray(parsed.objectives)) {
+      return parsed as AppData;
+    }
     return null;
   } catch {
     return null;
