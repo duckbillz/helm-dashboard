@@ -19,13 +19,15 @@ export default function OKRsTab({ objectives, onUpdate, teamMembers }: OKRsTabPr
   const [reordering, setReordering] = useState(false);
 
   // Get unique months
-  const months = [...new Set(objectives.map(o => o.month))].sort().reverse();
+  const months = [...new Set(objectives.map(o => o.month))].sort();
 
-  const filtered = objectives.filter(o => {
-    if (filterMonth !== 'all' && o.month !== filterMonth) return false;
-    if (filterStatus !== 'all' && o.status !== filterStatus) return false;
-    return true;
-  });
+  const filtered = objectives
+    .filter(o => {
+      if (filterMonth !== 'all' && o.month !== filterMonth) return false;
+      if (filterStatus !== 'all' && o.status !== filterStatus) return false;
+      return true;
+    })
+    .sort((a, b) => a.month.localeCompare(b.month));
 
   function handleUpdateObjective(updated: Objective) {
     onUpdate(objectives.map(o => o.id === updated.id ? updated : o));
