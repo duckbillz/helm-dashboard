@@ -3,6 +3,8 @@
 import { AppData } from './types';
 
 const STORAGE_KEY = 'helm-dashboard-data';
+const VERSION_KEY = 'helm-dashboard-version';
+const CURRENT_VERSION = 2; // Bump this to force a reset to defaults
 
 const DEFAULT_DATA: AppData = {
   objectives: [
@@ -137,36 +139,25 @@ const DEFAULT_DATA: AppData = {
 export function loadData(): AppData {
   if (typeof window === 'undefined') return DEFAULT_DATA;
   try {
+    const storedVersion = localStorage.getItem(VERSION_KEY);
+    const version = storedVersion ? parseInt(storedVersion, 10) : 0;
+
+    // If version is outdated, reset to fresh defaults
+    if (version < CURRENT_VERSION) {
+      localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
+      saveData(DEFAULT_DATA);
+      return DEFAULT_DATA;
+    }
+
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Migrate: add seriesA if missing or update VC pipeline to new format
-      if (!parsed.seriesA) {
-        parsed.seriesA = DEFAULT_DATA.seriesA;
-      } else if (parsed.seriesA.vcPipeline && parsed.seriesA.vcPipeline.length > 0) {
-        // Migrate: if VCs don't have the new columns (e.g. aliveOrDead), replace with defaults
-        const firstVC = parsed.seriesA.vcPipeline[0];
-        if (!('aliveOrDead' in firstVC)) {
-          parsed.seriesA.vcPipeline = DEFAULT_DATA.seriesA.vcPipeline;
-        }
-      }
-      // Migrate: if VC pipeline is too small (old seed data), replace with full list
-      if (parsed.seriesA.vcPipeline && parsed.seriesA.vcPipeline.length < 10) {
-        parsed.seriesA.vcPipeline = DEFAULT_DATA.seriesA.vcPipeline;
-      }
-      // Migrate: add email/ctr fields to metrics if missing
-      if (parsed.metrics) {
-        parsed.metrics = parsed.metrics.map((m: Record<string, unknown>) => ({
-          ...m,
-          emailOpenRate: m.emailOpenRate ?? 0,
-          clickThroughRate: m.clickThroughRate ?? 0,
-        }));
-      }
       return parsed;
     }
   } catch {
     // ignore parse errors
   }
+  localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
   saveData(DEFAULT_DATA);
   return DEFAULT_DATA;
 }
