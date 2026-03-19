@@ -1,10 +1,13 @@
 'use client';
 
 import { AppData } from './types';
+import { supabase } from './supabase';
 
 const STORAGE_KEY = 'helm-dashboard-data';
 const VERSION_KEY = 'helm-dashboard-version';
 const CURRENT_VERSION = 2; // Bump this to force a reset to defaults
+const SUPABASE_ROW_ID = 'singleton';
+const DEBOUNCE_MS = 1500;
 
 const DEFAULT_DATA: AppData = {
   objectives: [
@@ -162,9 +165,57 @@ export function loadData(): AppData {
   return DEFAULT_DATA;
 }
 
-export function saveData(data: AppData): void {
+export function saveData(data: AppData, skipRemote = false): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (!skipRemote) {
+    debouncedSaveToSupabase(data);
+  }
+}
+
+// --- Supabase sync ---
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+function debouncedSaveToSupabase(data: AppData): void {
+  if (!supabase) return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveToSupabase(data);
+  }, DEBOUNCE_MS);
+}
+
+async function saveToSupabase(data: AppData): Promise<void> {
+  if (!supabase) return;
+  try {
+    await supabase
+      .from('app_data')
+      .upsert({
+        id: SUPABASE_ROW_ID,
+        data: data,
+        updated_at: new Date().toISOString(),
+      });
+  } catch (err) {
+    console.error('Failed to save to Supabase:', err);
+  }
+}
+
+export async function loadDataFromSupabase(): Promise<AppData | null> {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase
+      .from('app_data')
+      .select('data')
+      .eq('id', SUPABASE_ROW_ID)
+      .single();
+    if (error || !data?.data) return null;
+    const appData = data.data as AppData;
+    // Only return if it has real content (not the empty seed)
+    if (appData.objectives) return appData;
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function generateId(): string {
