@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AppData } from '../lib/types';
-import { loadData, saveData, loadDataFromSupabase } from '../lib/storage';
+import { loadData, saveData, loadDataFromRemote } from '../lib/storage';
 import Header from '../components/Header';
 import { TabType } from '../components/Header';
 import OKRsTab from '../components/OKRsTab';
@@ -19,10 +19,10 @@ export default function Home() {
     setData(loadData());
   }, []);
 
-  // Step 2: Fetch from Supabase in background, use remote data as source of truth
+  // Step 2: Fetch from remote in background, use remote data as source of truth
   useEffect(() => {
-    async function syncFromSupabase() {
-      const remoteData = await loadDataFromSupabase();
+    async function syncFromRemote() {
+      const remoteData = await loadDataFromRemote();
       if (remoteData) {
         setData(remoteData);
         saveData(remoteData, true); // Update localStorage cache, skip re-uploading
@@ -31,7 +31,7 @@ export default function Home() {
         setSyncStatus('offline');
       }
     }
-    syncFromSupabase();
+    syncFromRemote();
   }, []);
 
   function updateData(newData: AppData) {

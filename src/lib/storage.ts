@@ -1,12 +1,10 @@
 'use client';
 
 import { AppData } from './types';
-import { supabase } from './supabase';
 
 const STORAGE_KEY = 'helm-dashboard-data';
 const VERSION_KEY = 'helm-dashboard-version';
-const CURRENT_VERSION = 2; // Bump this to force a reset to defaults
-const SUPABASE_ROW_ID = 'singleton';
+const CURRENT_VERSION = 2;
 const DEBOUNCE_MS = 1500;
 
 const DEFAULT_DATA: AppData = {
@@ -145,23 +143,21 @@ export function loadData(): AppData {
     const storedVersion = localStorage.getItem(VERSION_KEY);
     const version = storedVersion ? parseInt(storedVersion, 10) : 0;
 
-    // If version is outdated, reset to fresh defaults
     if (version < CURRENT_VERSION) {
       localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
-      saveData(DEFAULT_DATA);
+      saveData(DEFAULT_DATA, true);
       return DEFAULT_DATA;
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed;
+      return JSON.parse(stored);
     }
   } catch {
     // ignore parse errors
   }
   localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
-  saveData(DEFAULT_DATA);
+  saveData(DEFAULT_DATA, true);
   return DEFAULT_DATA;
 }
 
@@ -169,49 +165,45 @@ export function saveData(data: AppData, skipRemote = false): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if (!skipRemote) {
-    debouncedSaveToSupabase(data);
+    debouncedSaveToRemote(data);
   }
 }
 
-// --- Supabase sync ---
+// --- Remote sync via API route (Upstash Redis on server side) ---
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-function debouncedSaveToSupabase(data: AppData): void {
-  if (!supabase) return;
+function debouncedSaveToRemote(data: AppData): void {
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    saveToSupabase(data);
+    saveToRemote(data);
   }, DEBOUNCE_MS);
 }
 
-async function saveToSupabase(data: AppData): Promise<void> {
-  if (!supabase) return;
+async function saveToRemote(data: AppData): Promise<void> {
   try {
-    await supabase
-      .from('app_data')
-      .upsert({
-        id: SUPABASE_ROW_ID,
-        data: data,
-        updated_at: new Date().toISOString(),
-      });
+    const res = await fetch('/api/data', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      console.error('Failed to save to remote:', res.status);
+    }
   } catch (err) {
-    console.error('Failed to save to Supabase:', err);
+    console.error('Failed to save to remote:', err);
   }
 }
 
-export async function loadDataFromSupabase(): Promise<AppData | null> {
-  if (!supabase) return null;
+export async function loadDataFromRemote(): Promise<AppData | null> {
   try {
-    const { data, error } = await supabase
-      .from('app_data')
-      .select('data')
-      .eq('id', SUPABASE_ROW_ID)
-      .single();
-    if (error || !data?.data) return null;
-    const appData = data.data as AppData;
-    // Only return if it has real content (not the empty seed)
-    if (appData.objectives) return appData;
+    const res = await fetch('/api/data');
+    if (!res.ok) return null;
+    const { data } = await res.json();
+    if (!data) return null;
+    // data may come back as a string (from Redis) or as an object
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    if (parsed && parsed.objectives) return parsed as AppData;
     return null;
   } catch {
     return null;
