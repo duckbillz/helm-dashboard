@@ -16,6 +16,7 @@ export default function OKRsTab({ objectives, onUpdate, teamMembers }: OKRsTabPr
   const [showAddModal, setShowAddModal] = useState(false);
   const [filterMonth, setFilterMonth] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [reordering, setReordering] = useState(false);
 
   // Get unique months
   const months = [...new Set(objectives.map(o => o.month))].sort().reverse();
@@ -34,6 +35,14 @@ export default function OKRsTab({ objectives, onUpdate, teamMembers }: OKRsTabPr
     onUpdate(objectives.filter(o => o.id !== id));
   }
 
+  function moveObjective(index: number, direction: 'up' | 'down') {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= objectives.length) return;
+    const updated = [...objectives];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    onUpdate(updated);
+  }
+
   function handleAddObjective(obj: Objective) {
     onUpdate([obj, ...objectives]);
     setShowAddModal(false);
@@ -48,9 +57,18 @@ export default function OKRsTab({ objectives, onUpdate, teamMembers }: OKRsTabPr
             Monthly objectives &amp; key results — scored 1 to 10
           </p>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="btn-primary" style={{ fontSize: 14, padding: '10px 20px' }}>
-          + New Objective
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => setReordering(!reordering)}
+            className={reordering ? 'btn-primary' : 'btn-secondary'}
+            style={{ fontSize: 14, padding: '10px 20px' }}
+          >
+            {reordering ? 'Done Reordering' : 'Reorder'}
+          </button>
+          <button onClick={() => setShowAddModal(true)} className="btn-primary" style={{ fontSize: 14, padding: '10px 20px' }}>
+            + New Objective
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
@@ -84,15 +102,49 @@ export default function OKRsTab({ objectives, onUpdate, teamMembers }: OKRsTabPr
           </p>
         </div>
       ) : (
-        filtered.map(obj => (
-          <OKRCard
-            key={obj.id}
-            objective={obj}
-            onUpdate={handleUpdateObjective}
-            onDelete={handleDeleteObjective}
-            teamMembers={teamMembers}
-          />
-        ))
+        filtered.map((obj, idx) => {
+          const globalIdx = objectives.findIndex(o => o.id === obj.id);
+          return (
+            <div key={obj.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              {reordering && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 16 }}>
+                  <button
+                    onClick={() => moveObjective(globalIdx, 'up')}
+                    disabled={globalIdx === 0}
+                    style={{
+                      width: 28, height: 28, borderRadius: 6, border: '1px solid #D4CFC0',
+                      background: globalIdx === 0 ? '#F5F0DC' : '#FFFFFF', cursor: globalIdx === 0 ? 'default' : 'pointer',
+                      fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: globalIdx === 0 ? '#B8B8A8' : '#1A1A1A', opacity: globalIdx === 0 ? 0.5 : 1,
+                    }}
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => moveObjective(globalIdx, 'down')}
+                    disabled={globalIdx === objectives.length - 1}
+                    style={{
+                      width: 28, height: 28, borderRadius: 6, border: '1px solid #D4CFC0',
+                      background: globalIdx === objectives.length - 1 ? '#F5F0DC' : '#FFFFFF', cursor: globalIdx === objectives.length - 1 ? 'default' : 'pointer',
+                      fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: globalIdx === objectives.length - 1 ? '#B8B8A8' : '#1A1A1A', opacity: globalIdx === objectives.length - 1 ? 0.5 : 1,
+                    }}
+                  >
+                    ▼
+                  </button>
+                </div>
+              )}
+              <div style={{ flex: 1 }}>
+                <OKRCard
+                  objective={obj}
+                  onUpdate={handleUpdateObjective}
+                  onDelete={handleDeleteObjective}
+                  teamMembers={teamMembers}
+                />
+              </div>
+            </div>
+          );
+        })
       )}
 
       {showAddModal && (

@@ -333,6 +333,14 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
     setEditData([...editData, { id: generateId(), ...emptyVC }]);
   }
 
+  function moveVC(idx: number, direction: 'up' | 'down') {
+    const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= editData.length) return;
+    const u = [...editData];
+    [u[idx], u[newIdx]] = [u[newIdx], u[idx]];
+    setEditData(u);
+  }
+
   const aliveCount = contacts.filter(c => c.aliveOrDead === 'Alive').length;
   const deadCount = contacts.filter(c => c.aliveOrDead === 'Dead').length;
 
@@ -358,6 +366,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
             <thead>
               <tr style={{ background: '#F5F0DC' }}>
                 <th style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 600, fontSize: 11 }}>#</th>
+                <th style={{ padding: '6px 8px', textAlign: 'center', fontWeight: 600, fontSize: 11, width: 50 }}>Move</th>
                 {vcColumns.map(col => (
                   <th key={col.key} style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 600, fontSize: 11, minWidth: col.width }}>
                     {col.label}
@@ -370,6 +379,24 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
               {editData.map((c, idx) => (
                 <tr key={c.id} style={{ borderTop: '1px solid #F5F0DC' }}>
                   <td style={{ padding: '4px 8px', color: '#7A7A6E', fontSize: 11 }}>{idx + 1}</td>
+                  <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                    <button
+                      onClick={() => moveVC(idx, 'up')}
+                      disabled={idx === 0}
+                      style={{
+                        background: 'none', border: 'none', cursor: idx === 0 ? 'default' : 'pointer',
+                        fontSize: 11, color: idx === 0 ? '#D4CFC0' : '#1A1A1A', padding: '0 2px',
+                      }}
+                    >▲</button>
+                    <button
+                      onClick={() => moveVC(idx, 'down')}
+                      disabled={idx === editData.length - 1}
+                      style={{
+                        background: 'none', border: 'none', cursor: idx === editData.length - 1 ? 'default' : 'pointer',
+                        fontSize: 11, color: idx === editData.length - 1 ? '#D4CFC0' : '#1A1A1A', padding: '0 2px',
+                      }}
+                    >▼</button>
+                  </td>
                   {vcColumns.map(col => (
                     <td key={col.key} style={{ padding: '2px 4px' }}>
                       {col.key === 'aliveOrDead' ? (
