@@ -4,9 +4,17 @@ import { NextResponse } from 'next/server';
 const REDIS_KEY = 'helm-dashboard-data';
 
 function getRedis(): Redis | null {
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-  if (!url || !token) return null;
+  // Support all common Upstash/Vercel env var naming conventions
+  const url = process.env.KV_REST_API_URL
+    || process.env.UPSTASH_REDIS_REST_URL
+    || process.env.KV_URL;
+  const token = process.env.KV_REST_API_TOKEN
+    || process.env.UPSTASH_REDIS_REST_TOKEN
+    || process.env.KV_REST_API_READ_ONLY_TOKEN;
+  if (!url || !token) {
+    console.error('Redis env vars missing. Available:', Object.keys(process.env).filter(k => k.includes('KV') || k.includes('UPSTASH') || k.includes('REDIS')));
+    return null;
+  }
   return new Redis({ url, token });
 }
 
