@@ -9,10 +9,26 @@ import OKRsTab from '../components/OKRsTab';
 import MetricsTab from '../components/MetricsTab';
 import SeriesATab from '../components/SeriesATab';
 
+const AUTH_KEY = 'helm-dashboard-auth';
+const DASHBOARD_PASSWORD = 'helm2026';
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('series-a');
   const [data, setData] = useState<AppData | null>(null);
   const [syncStatus, setSyncStatus] = useState<'loading' | 'synced' | 'offline'>('loading');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(false);
+
+  // Check if already authenticated
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(AUTH_KEY);
+      if (stored === 'true') {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
 
   // Step 1: Load from localStorage immediately (fast)
   useEffect(() => {
@@ -59,6 +75,72 @@ export default function Home() {
     setData(newData);
     saveData(newData); // Saves to localStorage + debounced Supabase
     setSyncStatus('synced');
+  }
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (password === DASHBOARD_PASSWORD) {
+      setIsAuthenticated(true);
+      setAuthError(false);
+      sessionStorage.setItem(AUTH_KEY, 'true');
+    } else {
+      setAuthError(true);
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#F5F0DC' }}>
+        <div style={{ textAlign: 'center', width: 320 }}>
+          <img
+            src="/helm-logo.svg"
+            alt="Helm"
+            style={{ width: 64, height: 64, borderRadius: 16, margin: '0 auto 20px' }}
+          />
+          <h2 style={{ color: '#061E03', fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Helm Dashboard</h2>
+          <p style={{ color: '#7A7A6E', fontSize: 13, marginBottom: 24 }}>Enter password to continue</p>
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={password}
+              onChange={e => { setPassword(e.target.value); setAuthError(false); }}
+              placeholder="Password"
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: authError ? '2px solid #E53935' : '1px solid #D4CFC0',
+                fontSize: 14,
+                outline: 'none',
+                background: '#FFFFFF',
+                boxSizing: 'border-box',
+                marginBottom: 12,
+              }}
+            />
+            {authError && (
+              <p style={{ color: '#E53935', fontSize: 12, marginBottom: 12 }}>Incorrect password</p>
+            )}
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: 'none',
+                background: '#061E03',
+                color: '#FDF7E0',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Sign In
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   if (!data) {
