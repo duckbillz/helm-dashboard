@@ -45,6 +45,8 @@ const DEFAULT_DATA: AppData = {
       videosCreated: 3,
       cumulativeFundedAccounts: 28,
       cumulativeDepositsAUM: 185000,
+      emailOpenRate: 32.5,
+      clickThroughRate: 4.8,
       designPartners: [
         { id: 'dp1', name: 'Prudential', type: 'carrier', stage: 'in-discussion', expectedCloseDate: '2026-05-15' },
         { id: 'dp2', name: 'LPL Financial', type: 'distributor', stage: 'lead', expectedCloseDate: '2026-06-01' },
@@ -53,6 +55,83 @@ const DEFAULT_DATA: AppData = {
     },
   ],
   teamMembers: ['CEO', 'CPO', 'Staff Engineer'],
+  seriesA: {
+    targetRaiseAmount: '$3M',
+    targetTimeline: 'Q4 2026',
+    notes: '',
+    vcPipeline: [
+      { id: 'vc1', fundName: 'IA Capital Group', aliveOrDead: 'Alive', wave: '', contactName: 'Andy Lerner', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc2', fundName: 'Insurtech Fund', aliveOrDead: 'Alive', wave: '', contactName: 'David Gritz', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc3', fundName: 'Sierra Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Mark Fernandes', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc4', fundName: 'Anthemis', aliveOrDead: 'Alive', wave: '', contactName: 'Ali Geramian', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc5', fundName: 'QED Investors', aliveOrDead: 'Alive', wave: '', contactName: 'Laura Bock Amias Gerety', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc6', fundName: 'ManchestorStory', aliveOrDead: 'Alive', wave: '', contactName: 'David Miles', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc7', fundName: 'Eos Venture Partners', aliveOrDead: 'Alive', wave: '', contactName: 'Sam Evans', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc8', fundName: 'AmFam Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Brittanny', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc9', fundName: 'Core Innovation', aliveOrDead: 'Alive', wave: '', contactName: 'Edwin', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc10', fundName: 'Cambrian', aliveOrDead: 'Alive', wave: '', contactName: 'Rex', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc11', fundName: 'MassMutual Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Eric Emmons', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc12', fundName: 'MS&AD Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Jon Soberg', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc13', fundName: 'Bessemer Venture Partners', aliveOrDead: 'Alive', wave: '', contactName: 'Charles', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc14', fundName: 'Nationwide Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Erik Ross', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc15', fundName: 'Greycroft', aliveOrDead: 'Alive', wave: '', contactName: 'Tyler Olkowski, Ellie Wheeler', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc16', fundName: 'Brewer Lane', aliveOrDead: 'Alive', wave: '', contactName: 'John Kim', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: 'Partner (Strong)', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc17', fundName: 'ViewPoint', aliveOrDead: 'Alive', wave: '', contactName: 'Drew Aldrich', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: 'Partner (Neutral)', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc18', fundName: 'Field Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Kirby', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: 'Partner (Strong)', optimistConnection: 'Partner (Strong)', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc19', fundName: 'a16z', aliveOrDead: 'Alive', wave: '', contactName: 'Joe Schmidt', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc20', fundName: '8VC', aliveOrDead: 'Alive', wave: '', contactName: 'Bella', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc21', fundName: 'Clocktower Technology Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Ben Savage', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc22', fundName: 'Stellation', aliveOrDead: 'Alive', wave: '', contactName: 'PB II', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc23', fundName: 'Bain Capital Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc24', fundName: 'OMERS Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc25', fundName: 'Box Group', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc26', fundName: 'Eniac', aliveOrDead: 'Alive', wave: '', contactName: 'Nihal', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc27', fundName: 'Commerce', aliveOrDead: 'Alive', wave: '', contactName: 'Vivek', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc28', fundName: 'Tusk Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Jordan Nof', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc29', fundName: 'Accel', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc30', fundName: 'Lightspeed Venture Partners', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc31', fundName: 'Crosslink Capital', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc32', fundName: 'NYCA', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc33', fundName: 'SixThirty Ventures', aliveOrDead: 'Alive', wave: '', contactName: 'Atul', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc34', fundName: 'Shine Capital', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc35', fundName: 'Comcast Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc36', fundName: 'MTech Capital', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc37', fundName: 'Portage Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc38', fundName: 'Greenlight Re Innovations', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc39', fundName: 'Scor Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc40', fundName: 'True Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc41', fundName: 'Ribbit Capital', aliveOrDead: 'Alive', wave: '', contactName: 'Matt Wong', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc42', fundName: 'Proper Venture Partners', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc43', fundName: 'Better Tomorrow Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc44', fundName: 'FinTLV', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc45', fundName: 'Precursor Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc46', fundName: 'Susa Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc47', fundName: 'Foundation Capital', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc48', fundName: 'Pear VC', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc49', fundName: 'Afore Capital', aliveOrDead: 'Alive', wave: '', contactName: 'Gaurav Jain', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc50', fundName: 'First Round Capital', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc51', fundName: 'Primary Venture Partners', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc52', fundName: 'NextView Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc53', fundName: 'Flybridge', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc54', fundName: 'Costanoa Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc55', fundName: 'SignalFire', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc56', fundName: 'Kindred Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc57', fundName: 'Haystack', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc58', fundName: 'Newlin VC', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc59', fundName: 'Redsea Ventures', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc60', fundName: 'General Catalyst', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+      { id: 'vc61', fundName: 'Northzone VC', aliveOrDead: 'Alive', wave: '', contactName: '', stageOfConversation: '', sentiment: '', conversationNotes: '', ejfConnection: '', optimistConnection: '', runyonConnection: '', connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '' },
+    ],
+    teamPlan: [
+      { id: 'tp1', role: 'Senior Full-Stack Engineer', status: 'open', targetDate: '2026-06-01', notes: 'Post-raise hire' },
+      { id: 'tp2', role: 'Head of Growth', status: 'open', targetDate: '2026-07-01', notes: '' },
+    ],
+    tractionGoals: [
+      { id: 'tg1', milestone: 'Cumulative AUM', target: '$1M', current: '$185K', status: 'in-progress', notes: '' },
+      { id: 'tg2', milestone: 'Design Partners Signed', target: '5', current: '1', status: 'in-progress', notes: '' },
+      { id: 'tg3', milestone: 'Monthly Active Users', target: '500', current: '120', status: 'in-progress', notes: '' },
+    ],
+  },
 };
 
 export function loadData(): AppData {
@@ -60,7 +139,30 @@ export function loadData(): AppData {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      // Migrate: add seriesA if missing or update VC pipeline to new format
+      if (!parsed.seriesA) {
+        parsed.seriesA = DEFAULT_DATA.seriesA;
+      } else if (parsed.seriesA.vcPipeline && parsed.seriesA.vcPipeline.length > 0) {
+        // Migrate: if VCs don't have the new columns (e.g. aliveOrDead), replace with defaults
+        const firstVC = parsed.seriesA.vcPipeline[0];
+        if (!('aliveOrDead' in firstVC)) {
+          parsed.seriesA.vcPipeline = DEFAULT_DATA.seriesA.vcPipeline;
+        }
+      }
+      // Migrate: if VC pipeline is too small (old seed data), replace with full list
+      if (parsed.seriesA.vcPipeline && parsed.seriesA.vcPipeline.length < 10) {
+        parsed.seriesA.vcPipeline = DEFAULT_DATA.seriesA.vcPipeline;
+      }
+      // Migrate: add email/ctr fields to metrics if missing
+      if (parsed.metrics) {
+        parsed.metrics = parsed.metrics.map((m: Record<string, unknown>) => ({
+          ...m,
+          emailOpenRate: m.emailOpenRate ?? 0,
+          clickThroughRate: m.clickThroughRate ?? 0,
+        }));
+      }
+      return parsed;
     }
   } catch {
     // ignore parse errors

@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { AppData } from '../lib/types';
 import { loadData, saveData } from '../lib/storage';
 import Header from '../components/Header';
+import { TabType } from '../components/Header';
 import OKRsTab from '../components/OKRsTab';
 import MetricsTab from '../components/MetricsTab';
+import SeriesATab from '../components/SeriesATab';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'okrs' | 'metrics'>('okrs');
+  const [activeTab, setActiveTab] = useState<TabType>('series-a');
   const [data, setData] = useState<AppData | null>(null);
 
   useEffect(() => {
@@ -39,13 +41,20 @@ export default function Home() {
     <div style={{ minHeight: '100vh', background: '#F5F0DC' }}>
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
-        {activeTab === 'okrs' ? (
+        {activeTab === 'series-a' && (
+          <SeriesATab
+            data={data.seriesA}
+            onUpdate={seriesA => updateData({ ...data, seriesA })}
+          />
+        )}
+        {activeTab === 'okrs' && (
           <OKRsTab
             objectives={data.objectives}
             onUpdate={objectives => updateData({ ...data, objectives })}
             teamMembers={data.teamMembers}
           />
-        ) : (
+        )}
+        {activeTab === 'metrics' && (
           <MetricsTab
             metrics={data.metrics}
             onUpdate={metrics => updateData({ ...data, metrics })}

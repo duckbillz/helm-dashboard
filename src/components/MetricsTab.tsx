@@ -141,6 +141,10 @@ function MonthMetricsCard({
             onChange={v => setEditData({ ...editData, cumulativeFundedAccounts: Number(v) })} />
           <FieldInput label="Cumulative Deposits / AUM" type="number" value={editData.cumulativeDepositsAUM}
             onChange={v => setEditData({ ...editData, cumulativeDepositsAUM: Number(v) })} />
+          <FieldInput label="Email Open Rate (%)" type="number" value={editData.emailOpenRate ?? 0}
+            onChange={v => setEditData({ ...editData, emailOpenRate: Number(v) })} />
+          <FieldInput label="Click Through Rate (%)" type="number" value={editData.clickThroughRate ?? 0}
+            onChange={v => setEditData({ ...editData, clickThroughRate: Number(v) })} />
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -269,6 +273,8 @@ function MonthMetricsCard({
         <MetricCard label="Videos Created" value={data.videosCreated.toLocaleString()} />
         <MetricCard label="Funded Accounts" value={data.cumulativeFundedAccounts.toLocaleString()} />
         <MetricCard label="Deposits / AUM" value={formatCurrency(data.cumulativeDepositsAUM)} />
+        <MetricCard label="Email Open Rate" value={`${data.emailOpenRate ?? 0}%`} />
+        <MetricCard label="Click Through Rate" value={`${data.clickThroughRate ?? 0}%`} />
       </div>
 
       {/* Design Partners */}
@@ -357,6 +363,8 @@ function AddMonthModal({ onAdd, onClose }: { onAdd: (m: MonthlyMetrics) => void;
       videosCreated: 0,
       cumulativeFundedAccounts: 0,
       cumulativeDepositsAUM: 0,
+      emailOpenRate: 0,
+      clickThroughRate: 0,
       designPartners: [],
     });
   }

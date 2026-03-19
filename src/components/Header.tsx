@@ -1,9 +1,17 @@
 'use client';
 
+export type TabType = 'series-a' | 'okrs' | 'metrics';
+
 interface HeaderProps {
-  activeTab: 'okrs' | 'metrics';
-  onTabChange: (tab: 'okrs' | 'metrics') => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
+
+const tabs: { key: TabType; label: string }[] = [
+  { key: 'series-a', label: 'Series A Milestones' },
+  { key: 'okrs', label: 'OKRs' },
+  { key: 'metrics', label: 'Key Metrics' },
+];
 
 export default function Header({ activeTab, onTabChange }: HeaderProps) {
   return (
@@ -29,38 +37,24 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
           </span>
         </div>
         <nav style={{ display: 'flex', gap: 32 }}>
-          <button
-            onClick={() => onTabChange('okrs')}
-            className={activeTab === 'okrs' ? 'tab-active' : 'tab-inactive'}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: '12px 0',
-              fontSize: 14,
-              cursor: 'pointer',
-              color: activeTab === 'okrs' ? 'white' : 'rgba(255,255,255,0.6)',
-              borderBottom: activeTab === 'okrs' ? '3px solid #C8D96F' : '3px solid transparent',
-              fontWeight: activeTab === 'okrs' ? 600 : 400,
-            }}
-          >
-            OKRs
-          </button>
-          <button
-            onClick={() => onTabChange('metrics')}
-            className={activeTab === 'metrics' ? 'tab-active' : 'tab-inactive'}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: '12px 0',
-              fontSize: 14,
-              cursor: 'pointer',
-              color: activeTab === 'metrics' ? 'white' : 'rgba(255,255,255,0.6)',
-              borderBottom: activeTab === 'metrics' ? '3px solid #C8D96F' : '3px solid transparent',
-              fontWeight: activeTab === 'metrics' ? 600 : 400,
-            }}
-          >
-            Key Metrics
-          </button>
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => onTabChange(tab.key)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '12px 0',
+                fontSize: 14,
+                cursor: 'pointer',
+                color: activeTab === tab.key ? 'white' : 'rgba(255,255,255,0.6)',
+                borderBottom: activeTab === tab.key ? '3px solid #C8D96F' : '3px solid transparent',
+                fontWeight: activeTab === tab.key ? 600 : 400,
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </nav>
       </div>
     </header>
