@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppData } from '../lib/types';
 import { loadData, saveData, loadDataFromRemote } from '../lib/storage';
 import Header from '../components/Header';
@@ -31,46 +31,40 @@ export default function Home() {
     }
   }, []);
 
-  // Step 1: Load from localStorage immediately (fast)
-  useEffect(() => {
-    setData(loadData());
-  }, []);
+  const hasSynced = useRef(false);
 
-  // Step 2: Fetch from remote in background, use remote data as source of truth
+  // Step 1: Load from localStorage immediately, then sync from remote once
   useEffect(() => {
-    async function syncFromRemote() {
+    const localData = loadData();
+    setData(localData);
+
+    // Step 2: Fetch from remote once on mount
+    async function syncOnce() {
+      if (hasSynced.current) return;
+      hasSynced.current = true;
+
       const remoteData = await loadDataFromRemote();
       if (remoteData) {
-        // Remote data exists, use it
         setData(remoteData);
-        saveData(remoteData, true); // Update localStorage cache, skip re-uploading
+        saveData(remoteData, true);
         setSyncStatus('synced');
-      } else if (data) {
-        // Remote is empty but we have local data, push it to remote
-        await (async () => {
-          try {
-            const res = await fetch('/api/data', {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data),
-            });
-            if (res.ok) {
-              setSyncStatus('synced');
-            } else {
-              setSyncStatus('offline');
-            }
-          } catch {
-            setSyncStatus('offline');
-          }
-        })();
+      } else if (localData) {
+        try {
+          const res = await fetch('/api/data', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(localData),
+          });
+          setSyncStatus(res.ok ? 'synced' : 'offline');
+        } catch {
+          setSyncStatus('offline');
+        }
       } else {
         setSyncStatus('offline');
       }
     }
-    if (data) {
-      syncFromRemote();
-    }
-  }, [data]);
+    syncOnce();
+  }, []);
 
   function updateData(newData: AppData) {
     setData(newData);
