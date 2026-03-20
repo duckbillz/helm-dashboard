@@ -1,6 +1,6 @@
 'use client';
 
-export type TabType = 'guiding-principles' | 'series-a' | 'okrs' | 'metrics';
+export type TabType = 'walkthrough' | 'series-a' | 'okrs' | 'metrics';
 
 interface HeaderProps {
   activeTab: TabType;
@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const tabs: { key: TabType; label: string }[] = [
-  { key: 'guiding-principles', label: 'Guiding Principles' },
+  { key: 'walkthrough', label: 'Walk Through' },
   { key: 'series-a', label: 'Series A Milestones' },
   { key: 'okrs', label: 'OKRs' },
   { key: 'metrics', label: 'Key Metrics' },
