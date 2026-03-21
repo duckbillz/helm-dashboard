@@ -344,7 +344,20 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
   const aliveCount = contacts.filter(c => c.aliveOrDead === 'Alive').length;
   const deadCount = contacts.filter(c => c.aliveOrDead === 'Dead').length;
 
-  const filtered = filter === 'all' ? contacts : contacts.filter(c => c.aliveOrDead === filter);
+  function sortByWave(list: VCContact[]) {
+    return [...list].sort((a, b) => {
+      const waveA = a.wave.trim();
+      const waveB = b.wave.trim();
+      // Blank goes last
+      if (!waveA && !waveB) return 0;
+      if (!waveA) return 1;
+      if (!waveB) return -1;
+      // Numeric sort: 0, 1, 2, 3...
+      return parseFloat(waveA) - parseFloat(waveB);
+    });
+  }
+
+  const filtered = sortByWave(filter === 'all' ? contacts : contacts.filter(c => c.aliveOrDead === filter));
 
   function updateField(idx: number, key: keyof VCContact, value: string) {
     const u = [...editData];
