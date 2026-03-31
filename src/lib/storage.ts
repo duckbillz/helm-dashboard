@@ -140,22 +140,22 @@ const DEFAULT_DATA: AppData = {
 export function loadData(): AppData {
   if (typeof window === 'undefined') return DEFAULT_DATA;
   try {
-    const storedVersion = localStorage.getItem(VERSION_KEY);
-    const version = storedVersion ? parseInt(storedVersion, 10) : 0;
-
-    if (version < CURRENT_VERSION) {
-      localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
-      saveData(DEFAULT_DATA, true);
-      return DEFAULT_DATA;
-    }
-
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      // If we have stored data, always use it (don't reset based on version)
+      if (parsed && typeof parsed === 'object' && parsed.objectives) {
+        // Ensure version is tracked
+        if (!localStorage.getItem(VERSION_KEY)) {
+          localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
+        }
+        return parsed;
+      }
     }
   } catch {
     // ignore parse errors
   }
+  // Only use defaults if truly empty
   localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
   saveData(DEFAULT_DATA, true);
   return DEFAULT_DATA;
