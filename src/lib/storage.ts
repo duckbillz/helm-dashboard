@@ -4,7 +4,7 @@ import { AppData } from './types';
 
 const STORAGE_KEY = 'helm-dashboard-data';
 const VERSION_KEY = 'helm-dashboard-version';
-const CURRENT_VERSION = 2;
+const CURRENT_VERSION = 3;
 const DEBOUNCE_MS = 1500;
 
 const DEFAULT_DATA: AppData = {
