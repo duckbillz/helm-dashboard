@@ -8,13 +8,12 @@ import { TabType } from '../components/Header';
 import OKRsTab from '../components/OKRsTab';
 import MetricsTab from '../components/MetricsTab';
 import SeriesATab from '../components/SeriesATab';
-import WalkThroughTab from '../components/WalkThroughTab';
 
 const AUTH_KEY = 'helm-dashboard-auth';
 const DASHBOARD_PASSWORD = 'helm2026';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabType>('walkthrough');
+  const [activeTab, setActiveTab] = useState<TabType>('series-a');
   const [data, setData] = useState<AppData | null>(null);
   const [syncStatus, setSyncStatus] = useState<'loading' | 'synced' | 'offline'>('loading');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -161,9 +160,6 @@ export default function Home() {
         {syncStatus === 'synced' ? 'Synced' : syncStatus === 'loading' ? 'Syncing...' : 'Local only'}
       </div>
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
-        {activeTab === 'walkthrough' && (
-          <WalkThroughTab />
-        )}
         {activeTab === 'series-a' && (
           <SeriesATab
             data={data.seriesA}
