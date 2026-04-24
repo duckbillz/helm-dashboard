@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
+import { auth } from '../../../auth';
 
 const REDIS_KEY = 'helm-dashboard-data';
 
@@ -19,6 +20,10 @@ function getRedis(): Redis | null {
 }
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return NextResponse.json({ data: null, error: 'Unauthorized' }, { status: 401 });
+  }
   const redis = getRedis();
   if (!redis) {
     return NextResponse.json({ data: null, error: 'Redis not configured' }, { status: 503 });
@@ -33,6 +38,10 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const redis = getRedis();
   if (!redis) {
     return NextResponse.json({ error: 'Redis not configured' }, { status: 503 });

@@ -5,6 +5,7 @@ export type TabType = 'series-a' | 'okrs' | 'metrics';
 interface HeaderProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  onSignOut?: () => void;
 }
 
 const tabs: { key: TabType; label: string }[] = [
@@ -13,7 +14,7 @@ const tabs: { key: TabType; label: string }[] = [
   { key: 'metrics', label: 'Key Metrics' },
 ];
 
-export default function Header({ activeTab, onTabChange }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, onSignOut }: HeaderProps) {
   return (
     <header style={{ background: '#2D5A3D' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
@@ -32,9 +33,27 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               Helm
             </span>
           </div>
-          <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>
-            Management Dashboard
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>
+              Management Dashboard
+            </span>
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: 12,
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
         </div>
         <nav style={{ display: 'flex', gap: 32 }}>
           {tabs.map(tab => (
