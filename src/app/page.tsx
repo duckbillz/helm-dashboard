@@ -62,6 +62,12 @@ export default function Home() {
     window.location.href = '/api/auth/signout';
   }
 
+  // Hooks must run before any early-return — compute before the loading check
+  const toolsAlertCount = useMemo(
+    () => (data ? deriveSaaSSummary(data.saas, data.people).alertCount : 0),
+    [data],
+  );
+
   if (!data) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#F5F0DC' }}>
@@ -76,11 +82,6 @@ export default function Home() {
       </div>
     );
   }
-
-  const toolsAlertCount = useMemo(
-    () => deriveSaaSSummary(data.saas, data.people).alertCount,
-    [data.saas, data.people],
-  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F0DC' }}>
