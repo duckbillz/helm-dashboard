@@ -93,9 +93,72 @@ export interface SeriesAData {
   notes: string;
 }
 
+// --- People & SaaS / Subscription tracking ---
+
+export interface Person {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  jobTitle: string;
+  status: 'active' | 'inactive';
+  notes: string;
+}
+
+export type ToolCategory =
+  | 'Communication'
+  | 'Engineering'
+  | 'Productivity'
+  | 'Marketing'
+  | 'HR / People'
+  | 'Security'
+  | 'Finance'
+  | 'Other';
+
+export type ToolStatus = 'Active' | 'Trial' | 'Cancelled' | 'Pending';
+export type PricingModel = 'Per User' | 'Flat' | 'Usage-based' | 'Free';
+export type BillingCycle = 'Monthly' | 'Annual' | 'Quarterly';
+
+export interface SaaSTool {
+  id: string;
+  name: string;
+  category: ToolCategory;
+  vendor: string;
+  plan: string;
+  pricingModel: PricingModel;
+  costPerUserMo: number;        // For "Flat", treat as flat monthly cost
+  licensedSeats: number;
+  billingCycle: BillingCycle;
+  paymentMethod: string;
+  internalOwner: string;
+  vendorContact: string;
+  vendorEmail: string;
+  contractStart: string;        // ISO 'YYYY-MM-DD' or ''
+  renewalDate: string;          // ISO 'YYYY-MM-DD' or ''
+  autoRenew: boolean;
+  noticePeriodDays: number;
+  status: ToolStatus;
+  notes: string;
+}
+
+export interface SaaSAssignment {
+  id: string;
+  personId: string;
+  toolId: string;
+  dateAssigned: string;         // ISO 'YYYY-MM-DD' or ''
+  notes: string;
+}
+
+export interface SaaSData {
+  tools: SaaSTool[];
+  assignments: SaaSAssignment[];
+}
+
 export interface AppData {
   objectives: Objective[];
   metrics: MonthlyMetrics[];
-  teamMembers: string[];
+  teamMembers: string[];        // legacy: role labels for OKR owners / comment authors
   seriesA: SeriesAData;
+  people: Person[];             // named people (Farron, Anthony, future hires)
+  saas: SaaSData;               // tool catalog + user→tool assignments
 }

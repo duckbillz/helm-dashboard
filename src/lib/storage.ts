@@ -1,11 +1,44 @@
 'use client';
 
-import { AppData } from './types';
+import { AppData, Person, SaaSData } from './types';
 
 const STORAGE_KEY = 'helm-dashboard-data';
 const VERSION_KEY = 'helm-dashboard-version';
-const CURRENT_VERSION = 3;
+const CURRENT_VERSION = 4;
 const DEBOUNCE_MS = 1500;
+
+// --- Default people (seeded from xlsx Users sheet) ---
+const DEFAULT_PEOPLE: Person[] = [
+  { id: 'p-farron',  name: 'Farron Blanc',     email: 'farron@helmlife.ai',  department: 'Leadership', jobTitle: 'CEO', status: 'active', notes: '' },
+  { id: 'p-anthony', name: 'Anthony Schrauth', email: 'anthony@helmlife.ai', department: 'Leadership', jobTitle: 'COO', status: 'active', notes: '' },
+];
+
+// --- Default SaaS catalog (seeded from xlsx Tools + Assignments sheets) ---
+const DEFAULT_SAAS: SaaSData = {
+  tools: [
+    { id: 't-slack',           name: 'Slack',                   category: 'Communication', vendor: 'Salesforce',   plan: 'Pro',               pricingModel: 'Per User', costPerUserMo: 4.38, licensedSeats: 2,  billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••2483', internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-27', renewalDate: '2026-07-27', autoRenew: true, noticePeriodDays: 5,  status: 'Active', notes: '50% off for the first three months. After three months, switch to the annual plan to pay less.' },
+    { id: 't-google-workspace',name: 'Google Workspace',        category: 'Productivity',  vendor: 'Google',       plan: 'Business Standard', pricingModel: 'Per User', costPerUserMo: 14,   licensedSeats: 2,  billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••9012', internalOwner: 'Farron',  vendorContact: '', vendorEmail: '', contractStart: '2026-04-18', renewalDate: '2027-05-02', autoRenew: true, noticePeriodDays: 30, status: 'Active', notes: '' },
+    { id: 't-granola-promo',   name: "Granola (Lenny's Promo)", category: 'Productivity',  vendor: 'Granola',      plan: 'Business',          pricingModel: 'Per User', costPerUserMo: 0,    licensedSeats: 10, billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••2483', internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-27', renewalDate: '2027-04-26', autoRenew: true, noticePeriodDays: 5,  status: 'Active', notes: "First year of Business plan free for 10 users via Lenny's Product Pass. $14/user/month after that." },
+    { id: 't-claude-max',      name: 'Claude Max 5x',           category: 'Productivity',  vendor: 'Anthropic',    plan: 'Max 5x',            pricingModel: 'Per User', costPerUserMo: 100,  licensedSeats: 2,  billingCycle: 'Monthly', paymentMethod: 'Individual',                  internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-28', renewalDate: '',           autoRenew: true, noticePeriodDays: 1,  status: 'Active', notes: '' },
+    { id: 't-linear-promo',    name: "Linear (Lenny's Promo)",  category: 'Productivity',  vendor: 'Linear Orbit', plan: 'Business',          pricingModel: 'Per User', costPerUserMo: 0,    licensedSeats: 5,  billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••2483', internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-28', renewalDate: '2027-04-27', autoRenew: true, noticePeriodDays: 5,  status: 'Active', notes: "First year of Business plan free for 10 users via Lenny's Product Pass. $18/user/month after that." },
+    { id: 't-notion-promo',    name: "Notion (Lenny's Promo)",  category: 'Productivity',  vendor: 'Notion',       plan: 'Business',          pricingModel: 'Per User', costPerUserMo: 0,    licensedSeats: 1,  billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••2483', internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-28', renewalDate: '2027-04-27', autoRenew: true, noticePeriodDays: 5,  status: 'Active', notes: "First year of Business plan free for 10 users via Lenny's Product Pass. $18/user/month after that." },
+    { id: 't-notion-monthly',  name: 'Notion (Monthly)',        category: 'Productivity',  vendor: 'Notion',       plan: 'Business',          pricingModel: 'Per User', costPerUserMo: 24,   licensedSeats: 1,  billingCycle: 'Monthly', paymentMethod: 'Mercury MC ••2483', internalOwner: 'Anthony', vendorContact: '', vendorEmail: '', contractStart: '2026-04-28', renewalDate: '2027-04-27', autoRenew: true, noticePeriodDays: 5,  status: 'Active', notes: 'Monthly rate is $24/month, drops to $20/month if paid annually. To qualify for the Lenny’s promo everyone else in the workspace must pay month-to-month. Switch to annual once we have more than 5 users.' },
+  ],
+  assignments: [
+    { id: 'a-1',  personId: 'p-farron',  toolId: 't-google-workspace', dateAssigned: '2026-04-16', notes: '' },
+    { id: 'a-2',  personId: 'p-farron',  toolId: 't-slack',            dateAssigned: '2026-04-27', notes: '' },
+    { id: 'a-3',  personId: 'p-farron',  toolId: 't-granola-promo',    dateAssigned: '2026-04-27', notes: '' },
+    { id: 'a-4',  personId: 'p-anthony', toolId: 't-google-workspace', dateAssigned: '2026-04-23', notes: '' },
+    { id: 'a-5',  personId: 'p-anthony', toolId: 't-slack',            dateAssigned: '2026-04-27', notes: '' },
+    { id: 'a-6',  personId: 'p-anthony', toolId: 't-granola-promo',    dateAssigned: '2026-04-27', notes: '' },
+    { id: 'a-7',  personId: 'p-anthony', toolId: 't-claude-max',       dateAssigned: '2026-04-28', notes: '' },
+    { id: 'a-8',  personId: 'p-farron',  toolId: 't-claude-max',       dateAssigned: '2026-04-28', notes: '' },
+    { id: 'a-9',  personId: 'p-anthony', toolId: 't-linear-promo',     dateAssigned: '2026-04-28', notes: '' },
+    { id: 'a-10', personId: 'p-farron',  toolId: 't-linear-promo',     dateAssigned: '2026-04-28', notes: '' },
+    { id: 'a-11', personId: 'p-anthony', toolId: 't-notion-promo',     dateAssigned: '2026-04-28', notes: '' },
+    { id: 'a-12', personId: 'p-farron',  toolId: 't-notion-monthly',   dateAssigned: '2026-04-28', notes: '' },
+  ],
+};
 
 const DEFAULT_DATA: AppData = {
   objectives: [
@@ -58,6 +91,8 @@ const DEFAULT_DATA: AppData = {
     },
   ],
   teamMembers: ['CEO', 'CPO', 'Staff Engineer'],
+  people: DEFAULT_PEOPLE,
+  saas: DEFAULT_SAAS,
   seriesA: {
     targetRaiseAmount: '$3M',
     targetTimeline: 'Q4 2026',
@@ -137,6 +172,19 @@ const DEFAULT_DATA: AppData = {
   },
 };
 
+// Non-destructive migration: fills in any missing top-level fields with their
+// defaults. Never overwrites existing user data.
+function migrateData(parsed: Partial<AppData> & { [key: string]: unknown }): AppData {
+  return {
+    objectives: parsed.objectives || DEFAULT_DATA.objectives,
+    metrics: parsed.metrics || DEFAULT_DATA.metrics,
+    teamMembers: parsed.teamMembers || DEFAULT_DATA.teamMembers,
+    seriesA: parsed.seriesA || DEFAULT_DATA.seriesA,
+    people: parsed.people && parsed.people.length > 0 ? parsed.people : DEFAULT_PEOPLE,
+    saas: parsed.saas && parsed.saas.tools ? parsed.saas : DEFAULT_SAAS,
+  };
+}
+
 export function loadData(): AppData {
   if (typeof window === 'undefined') return DEFAULT_DATA;
   try {
@@ -149,7 +197,7 @@ export function loadData(): AppData {
         if (!localStorage.getItem(VERSION_KEY)) {
           localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
         }
-        return parsed;
+        return migrateData(parsed);
       }
     }
   } catch {
@@ -205,7 +253,7 @@ export async function loadDataFromRemote(): Promise<AppData | null> {
     const parsed = typeof data === 'string' ? JSON.parse(data) : data;
     // Return the data if it has the expected shape (at least has objectives array)
     if (parsed && typeof parsed === 'object' && Array.isArray(parsed.objectives)) {
-      return parsed as AppData;
+      return migrateData(parsed);
     }
     return null;
   } catch {

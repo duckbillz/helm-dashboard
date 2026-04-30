@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { AppData } from '../lib/types';
 import { loadData, saveData, loadDataFromRemote } from '../lib/storage';
+import { deriveSaaSSummary } from '../lib/saasMetrics';
 import Header from '../components/Header';
 import { TabType } from '../components/Header';
 import OKRsTab from '../components/OKRsTab';
 import MetricsTab from '../components/MetricsTab';
 import SeriesATab from '../components/SeriesATab';
+import ToolsTab from '../components/ToolsTab';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('series-a');
@@ -75,9 +77,19 @@ export default function Home() {
     );
   }
 
+  const toolsAlertCount = useMemo(
+    () => deriveSaaSSummary(data.saas, data.people).alertCount,
+    [data.saas, data.people],
+  );
+
   return (
     <div style={{ minHeight: '100vh', background: '#F5F0DC' }}>
-      <Header activeTab={activeTab} onTabChange={setActiveTab} onSignOut={handleSignOut} />
+      <Header
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onSignOut={handleSignOut}
+        toolsAlertCount={toolsAlertCount}
+      />
       <div style={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.9)', padding: '6px 12px', borderRadius: 20, fontSize: 11, color: '#7A7A6E', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', zIndex: 50 }}>
         <span style={{ width: 8, height: 8, borderRadius: '50%', background: syncStatus === 'synced' ? '#4CAF50' : syncStatus === 'loading' ? '#FFC107' : '#9E9E9E' }} />
         {syncStatus === 'synced' ? 'Synced' : syncStatus === 'loading' ? 'Syncing...' : 'Local only'}
@@ -100,6 +112,14 @@ export default function Home() {
           <MetricsTab
             metrics={data.metrics}
             onUpdate={metrics => updateData({ ...data, metrics })}
+          />
+        )}
+        {activeTab === 'tools' && (
+          <ToolsTab
+            saas={data.saas}
+            people={data.people}
+            onUpdateSaas={saas => updateData({ ...data, saas })}
+            onUpdatePeople={people => updateData({ ...data, people })}
           />
         )}
       </main>
