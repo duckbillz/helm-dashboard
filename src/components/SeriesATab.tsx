@@ -296,6 +296,26 @@ function TractionCard({ goals, onUpdate }: { goals: TractionMilestone[]; onUpdat
 
 /* ===================== VC PIPELINE ===================== */
 
+// Header cell style for the VC table. Each <th> needs its own opaque
+// background and an inset bottom border, because `position: sticky` doesn't
+// honor a background or border applied to the parent <tr>/<thead> in some
+// browsers — the rows would scroll up under the header and the bottom edge
+// would disappear.
+function stickyTh(extra: React.CSSProperties = {}): React.CSSProperties {
+  return {
+    position: 'sticky',
+    top: 0,
+    zIndex: 2,
+    background: '#F5F0DC',
+    boxShadow: 'inset 0 -1px 0 #D4C98A',
+    padding: '6px 8px',
+    textAlign: 'left',
+    fontWeight: 600,
+    fontSize: 11,
+    ...extra,
+  };
+}
+
 const emptyVC: Omit<VCContact, 'id'> = {
   fundName: '', aliveOrDead: 'Alive', wave: '', contactName: '',
   stageOfConversation: '', sentiment: '', conversationNotes: '',
@@ -374,18 +394,18 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
             <button onClick={addContact} className="btn-secondary" style={{ padding: '4px 12px', fontSize: 12 }}>+ Add VC</button>
           </div>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ maxHeight: '70vh', overflow: 'auto', border: '1px solid #F5F0DC', borderRadius: 6 }}>
           <table style={{ borderCollapse: 'collapse', fontSize: 12, minWidth: 1600 }}>
             <thead>
-              <tr style={{ background: '#F5F0DC' }}>
-                <th style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 600, fontSize: 11 }}>#</th>
-                <th style={{ padding: '6px 8px', textAlign: 'center', fontWeight: 600, fontSize: 11, width: 50 }}>Move</th>
+              <tr>
+                <th style={stickyTh({ width: undefined })}>#</th>
+                <th style={stickyTh({ width: 50, textAlign: 'center' })}>Move</th>
                 {vcColumns.map(col => (
-                  <th key={col.key} style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 600, fontSize: 11, minWidth: col.width }}>
+                  <th key={col.key} style={stickyTh({ minWidth: col.width })}>
                     {col.label}
                   </th>
                 ))}
-                <th style={{ padding: '6px 8px', width: 30 }}></th>
+                <th style={stickyTh({ width: 30 })}></th>
               </tr>
             </thead>
             <tbody>
@@ -490,12 +510,12 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
       {filtered.length === 0 ? (
         <p style={{ fontSize: 13, color: '#7A7A6E', textAlign: 'center' }}>No VCs in pipeline yet.</p>
       ) : (
-        <div style={{ overflowX: 'auto', border: '1px solid #F5F0DC', borderRadius: 6 }}>
+        <div style={{ maxHeight: '70vh', overflow: 'auto', border: '1px solid #F5F0DC', borderRadius: 6 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 1400 }}>
             <thead>
-              <tr style={{ background: '#F5F0DC' }}>
+              <tr>
                 {vcColumns.map(col => (
-                  <th key={col.key} style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 600, fontSize: 11, whiteSpace: 'nowrap' }}>
+                  <th key={col.key} style={stickyTh({ whiteSpace: 'nowrap', padding: '8px 10px' })}>
                     {col.label}
                   </th>
                 ))}
