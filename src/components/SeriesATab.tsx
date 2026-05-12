@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { SeriesAData, VCContact, TeamMilestone, TractionMilestone } from '../lib/types';
 import { generateId } from '../lib/storage';
+import { formatLocalDate } from '../lib/helpers';
 
 interface SeriesATabProps {
   data: SeriesAData;
@@ -185,7 +186,7 @@ function TeamPlanCard({ roles, onUpdate }: { roles: TeamMilestone[]; onUpdate: (
                 </span>
               </div>
               <div style={{ fontSize: 12, color: '#7A7A6E' }}>
-                {r.targetDate ? `Target: ${new Date(r.targetDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'No target date'}
+                {r.targetDate ? `Target: ${formatLocalDate(r.targetDate)}` : 'No target date'}
               </div>
               {r.notes && <div style={{ fontSize: 12, color: '#7A7A6E', marginTop: 4 }}>{r.notes}</div>}
             </div>

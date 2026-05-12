@@ -55,6 +55,24 @@ export function getStageLabel(stage: string): string {
   }
 }
 
+// Parse a 'YYYY-MM-DD' string as local-time midnight, avoiding the JavaScript
+// gotcha where `new Date('2026-01-01')` is interpreted as UTC and silently
+// rolls back to Dec 31 in any timezone west of UTC.
+export function parseLocalDate(iso: string): Date | null {
+  if (!iso) return null;
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+
+export function formatLocalDate(iso: string, opts?: Intl.DateTimeFormatOptions): string {
+  const d = parseLocalDate(iso);
+  if (!d) return '';
+  return d.toLocaleDateString(
+    'en-US',
+    opts || { month: 'short', day: 'numeric', year: 'numeric' },
+  );
+}
+
 export function getStageColor(stage: string): string {
   switch (stage) {
     case 'lead': return '#B8B8A8';
