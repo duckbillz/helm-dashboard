@@ -24,6 +24,29 @@ const COLUMNS: { key: keyof VCContact; label: string }[] = [
   { key: 'insurtechFintechInvestments', label: 'Insurtech/Fintech Investments' },
 ];
 
+// Status column is at index 1 (column B in A1 notation).
+const STATUS_COLUMN_INDEX = 1;
+
+// Same status-then-wave sort as the dashboard read view.
+function statusRank(s: string): number {
+  if (s === 'Alive') return 0;
+  if (s === 'Avoid') return 1;
+  if (s === 'Dead') return 2;
+  return 3;
+}
+function sortVCsForExport(list: VCContact[]): VCContact[] {
+  return [...list].sort((a, b) => {
+    const rankDiff = statusRank(a.aliveOrDead) - statusRank(b.aliveOrDead);
+    if (rankDiff !== 0) return rankDiff;
+    const waveA = (a.wave || '').trim();
+    const waveB = (b.wave || '').trim();
+    if (!waveA && !waveB) return 0;
+    if (!waveA) return 1;
+    if (!waveB) return -1;
+    return parseFloat(waveA) - parseFloat(waveB);
+  });
+}
+
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.email) {
@@ -70,7 +93,8 @@ export async function POST(request: Request) {
     },
   }));
 
-  const dataRows = vcs.map(c => ({
+  const sortedVCs = sortVCsForExport(vcs);
+  const dataRows = sortedVCs.map(c => ({
     values: COLUMNS.map(col => ({
       userEnteredValue: { stringValue: String(c[col.key] ?? '') },
       userEnteredFormat: { wrapStrategy: 'WRAP' as const, verticalAlignment: 'TOP' as const },
@@ -118,9 +142,65 @@ export async function POST(request: Request) {
   const sheetData = (await createRes.json()) as {
     spreadsheetId: string;
     spreadsheetUrl: string;
+    sheets?: Array<{ properties?: { sheetId?: number } }>;
   };
+  const firstSheetId = sheetData.sheets?.[0]?.properties?.sheetId ?? 0;
 
-  // ---------- Step 2: share with "anyone with the link" as commenter ----------
+  // ---------- Step 2: conditional formatting for Avoid rows ----------
+  // The Sheets API doesn't accept conditional format rules in the initial
+  // create call, so we attach them with a follow-up batchUpdate. We reference
+  // the Status column ($B<row>) so the highlight stays correct even if the
+  // user re-sorts the sheet later.
+  const cfRes = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetData.spreadsheetId}:batchUpdate`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [
+                  {
+                    sheetId: firstSheetId,
+                    startRowIndex: 1, // skip header
+                    startColumnIndex: 0,
+                    endColumnIndex: COLUMNS.length,
+                  },
+                ],
+                booleanRule: {
+                  condition: {
+                    type: 'CUSTOM_FORMULA',
+                    values: [
+                      {
+                        userEnteredValue: `=$${String.fromCharCode(65 + STATUS_COLUMN_INDEX)}2="Avoid"`,
+                      },
+                    ],
+                  },
+                  format: {
+                    // Pale lavender — matches the dashboard's Avoid row tint (#F0EBF7)
+                    backgroundColor: { red: 0.941, green: 0.922, blue: 0.969 },
+                  },
+                },
+              },
+              index: 0,
+            },
+          },
+        ],
+      }),
+    },
+  );
+  if (!cfRes.ok) {
+    const errText = await cfRes.text();
+    console.error('Conditional formatting failed (non-fatal):', cfRes.status, errText);
+    // Continue — the sheet is still usable, just without auto-highlighting
+  }
+
+  // ---------- Step 3: share with "anyone with the link" as commenter ----------
   const permRes = await fetch(
     `https://www.googleapis.com/drive/v3/files/${sheetData.spreadsheetId}/permissions?supportsAllDrives=true`,
     {
