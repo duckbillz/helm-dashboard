@@ -347,7 +347,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [exporting, setExporting] = useState(false);
-  const [exportResult, setExportResult] = useState<{ url?: string; error?: string } | null>(null);
+  const [exportResult, setExportResult] = useState<{ url?: string; error?: string; details?: string } | null>(null);
 
   function handleDrop(targetIdx: number) {
     if (dragIndex === null || dragIndex === targetIdx) {
@@ -376,7 +376,10 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
       });
       const data = await res.json();
       if (!res.ok) {
-        setExportResult({ error: data.error || `Export failed (HTTP ${res.status})` });
+        setExportResult({
+          error: data.error || `Export failed (HTTP ${res.status})`,
+          details: data.details,
+        });
       } else {
         setExportResult({ url: data.url });
         window.open(data.url, '_blank');
@@ -603,13 +606,31 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
         <div style={{
           background: '#FFEBEE', border: '1px solid #C62828', borderRadius: 6,
           padding: '10px 12px', marginBottom: 12, fontSize: 12, color: '#C62828',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
         }}>
-          <span><strong>Export failed.</strong> {exportResult.error}</span>
-          <button
-            onClick={() => setExportResult(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#C62828', padding: 0, lineHeight: 1, flexShrink: 0 }}
-          >×</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+            <span><strong>Export failed.</strong> {exportResult.error}</span>
+            <button
+              onClick={() => setExportResult(null)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#C62828', padding: 0, lineHeight: 1, flexShrink: 0 }}
+            >×</button>
+          </div>
+          {exportResult.details && (
+            <details style={{ marginTop: 8 }}>
+              <summary style={{ cursor: 'pointer', fontSize: 11, color: '#7A1A1A', fontWeight: 600 }}>
+                Show Google&apos;s response
+              </summary>
+              <pre style={{
+                marginTop: 6, padding: 8, background: '#FFF', borderRadius: 4,
+                fontSize: 11, color: '#1A1A1A', overflow: 'auto', maxHeight: 200,
+                whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+              }}>
+                {(() => {
+                  try { return JSON.stringify(JSON.parse(exportResult.details), null, 2); }
+                  catch { return exportResult.details; }
+                })()}
+              </pre>
+            </details>
+          )}
         </div>
       )}
       <style>{`@keyframes helm-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
