@@ -445,7 +445,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
     return (
       <div className="card" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>VC Pipeline</h3>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Seed VC Pipeline</h3>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={addContact} className="btn-secondary" style={{ padding: '4px 12px', fontSize: 12 }}>+ Add VC</button>
           </div>
@@ -568,7 +568,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
   return (
     <div className="card" style={{ marginBottom: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>VC Pipeline ({contacts.length})</h3>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Seed VC Pipeline ({contacts.length})</h3>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={handleExportToSheets}
@@ -582,7 +582,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                 <span style={{ width: 10, height: 10, border: '2px solid #2D5A3D', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'helm-spin 0.7s linear infinite' }} />
                 Exporting…
               </>
-            ) : '📤 Export & Share to Google Sheets'}
+            ) : 'Export – Sheets'}
           </button>
           <button onClick={startEdit} className="btn-secondary" style={{ padding: '4px 12px', fontSize: 12 }}>Edit</button>
         </div>

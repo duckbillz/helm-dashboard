@@ -80,7 +80,7 @@ export async function POST(request: Request) {
 
   const sheetTitle =
     title ||
-    `Helm VC Pipeline – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    `Helm Seed VC Pipeline – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   // ---------- Step 1: create the spreadsheet ----------
   const headerCells = COLUMNS.map(col => ({
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     sheets: [
       {
         properties: {
-          title: 'VC Pipeline',
+          title: 'Seed VC Pipeline',
           gridProperties: { frozenRowCount: 1 },
         },
         data: [
