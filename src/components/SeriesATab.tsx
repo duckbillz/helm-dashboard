@@ -320,6 +320,7 @@ function stickyTh(extra: React.CSSProperties = {}): React.CSSProperties {
 const emptyVC: Omit<VCContact, 'id'> = {
   fundName: '', aliveOrDead: 'Alive', wave: '', contactName: '',
   stageOfConversation: '', sentiment: '', conversationNotes: '',
+  lastContact: '',
   ejfConnection: '', optimistConnection: '', runyonConnection: '',
   connectedBy: '', dataRoom: '', customerCalls: '', insurtechFintechInvestments: '',
 };
@@ -332,6 +333,7 @@ const vcColumns: { key: keyof VCContact; label: string; width?: number }[] = [
   { key: 'stageOfConversation', label: 'Stage', width: 120 },
   { key: 'sentiment', label: 'Sentiment', width: 90 },
   { key: 'conversationNotes', label: 'Conversation Notes', width: 180 },
+  { key: 'lastContact', label: 'Last Contact', width: 130 },
   { key: 'ejfConnection', label: 'EJF Connection', width: 120 },
   { key: 'optimistConnection', label: 'Optimist Connection', width: 120 },
   { key: 'runyonConnection', label: 'Runyon Connection', width: 120 },
@@ -535,9 +537,16 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                           <option value="Avoid">Avoid</option>
                           <option value="">—</option>
                         </select>
+                      ) : col.key === 'lastContact' ? (
+                        <input
+                          type="date"
+                          value={c[col.key] || ''}
+                          onChange={e => updateField(idx, col.key, e.target.value)}
+                          style={{ fontSize: 11, padding: '2px 4px', width: '100%' }}
+                        />
                       ) : (
                         <input
-                          value={c[col.key]}
+                          value={c[col.key] || ''}
                           onChange={e => updateField(idx, col.key, e.target.value)}
                           style={{ fontSize: 11, padding: '2px 6px', width: '100%' }}
                         />
@@ -717,6 +726,13 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                     }
                     if (col.key === 'fundName') {
                       return <td key={col.key} style={{ padding: '6px 10px', fontWeight: 500 }}>{val || '—'}</td>;
+                    }
+                    if (col.key === 'lastContact') {
+                      return (
+                        <td key={col.key} style={{ padding: '6px 10px', color: val ? '#1A1A1A' : '#B8B8A8', whiteSpace: 'nowrap' }}>
+                          {val ? formatLocalDate(val) : '—'}
+                        </td>
+                      );
                     }
                     return <td key={col.key} style={{ padding: '6px 10px', color: val ? '#1A1A1A' : '#B8B8A8' }}>{val || '—'}</td>;
                   })}

@@ -58,6 +58,7 @@ export interface VCContact {
   stageOfConversation: string;
   sentiment: string;
   conversationNotes: string;
+  lastContact?: string;        // ISO 'YYYY-MM-DD' or '' — date of last touch
   ejfConnection: string;
   optimistConnection: string;
   runyonConnection: string;

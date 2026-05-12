@@ -7,7 +7,7 @@ interface ExportRequest {
   title?: string;
 }
 
-const COLUMNS: { key: keyof VCContact; label: string }[] = [
+const COLUMNS: { key: keyof VCContact; label: string; type?: 'date' }[] = [
   { key: 'fundName', label: 'Fund Name' },
   { key: 'aliveOrDead', label: 'Status' },
   { key: 'wave', label: 'Wave' },
@@ -15,6 +15,7 @@ const COLUMNS: { key: keyof VCContact; label: string }[] = [
   { key: 'stageOfConversation', label: 'Stage of Conversation' },
   { key: 'sentiment', label: 'Sentiment' },
   { key: 'conversationNotes', label: 'Conversation Notes' },
+  { key: 'lastContact', label: 'Last Contact', type: 'date' },
   { key: 'ejfConnection', label: 'EJF Connection' },
   { key: 'optimistConnection', label: 'Optimist Connection' },
   { key: 'runyonConnection', label: 'Runyon Connection' },
@@ -26,6 +27,17 @@ const COLUMNS: { key: keyof VCContact; label: string }[] = [
 
 // Status column is at index 1 (column B in A1 notation).
 const STATUS_COLUMN_INDEX = 1;
+
+// Google Sheets stores dates as serial numbers: days since the (broken) epoch
+// of Dec 30, 1899. Returns null if the ISO string can't be parsed.
+function isoToSheetSerial(iso: string): number | null {
+  if (!iso) return null;
+  const d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d.getTime())) return null;
+  // Sheets epoch is Dec 30, 1899 UTC
+  const epoch = Date.UTC(1899, 11, 30);
+  return Math.floor((d.getTime() - epoch) / 86400000);
+}
 
 // Same status-then-wave sort as the dashboard read view.
 function statusRank(s: string): number {
@@ -95,10 +107,35 @@ export async function POST(request: Request) {
 
   const sortedVCs = sortVCsForExport(vcs);
   const dataRows = sortedVCs.map(c => ({
-    values: COLUMNS.map(col => ({
-      userEnteredValue: { stringValue: String(c[col.key] ?? '') },
-      userEnteredFormat: { wrapStrategy: 'WRAP' as const, verticalAlignment: 'TOP' as const },
-    })),
+    values: COLUMNS.map(col => {
+      const raw = c[col.key];
+      if (col.type === 'date') {
+        const serial = isoToSheetSerial(typeof raw === 'string' ? raw : '');
+        if (serial !== null) {
+          return {
+            userEnteredValue: { numberValue: serial },
+            userEnteredFormat: {
+              numberFormat: { type: 'DATE' as const, pattern: 'mmm d, yyyy' },
+              wrapStrategy: 'WRAP' as const,
+              verticalAlignment: 'TOP' as const,
+            },
+          };
+        }
+        // No date or invalid — leave the cell blank but still apply date format
+        return {
+          userEnteredValue: { stringValue: '' },
+          userEnteredFormat: {
+            numberFormat: { type: 'DATE' as const, pattern: 'mmm d, yyyy' },
+            wrapStrategy: 'WRAP' as const,
+            verticalAlignment: 'TOP' as const,
+          },
+        };
+      }
+      return {
+        userEnteredValue: { stringValue: String(raw ?? '') },
+        userEnteredFormat: { wrapStrategy: 'WRAP' as const, verticalAlignment: 'TOP' as const },
+      };
+    }),
   }));
 
   const createBody = {
