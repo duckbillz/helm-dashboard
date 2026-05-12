@@ -343,7 +343,50 @@ const vcColumns: { key: keyof VCContact; label: string; width?: number }[] = [
 function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdate: (c: VCContact[]) => void }) {
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState(contacts);
-  const [filter, setFilter] = useState<'all' | 'Alive' | 'Dead'>('all');
+  const [filter, setFilter] = useState<'all' | 'Alive' | 'Dead' | 'Avoid'>('all');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<{ url?: string; error?: string } | null>(null);
+
+  function handleDrop(targetIdx: number) {
+    if (dragIndex === null || dragIndex === targetIdx) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const u = [...editData];
+    const [moved] = u.splice(dragIndex, 1);
+    // Adjust insertion index if moving down (item removed shifts indices)
+    const insertAt = dragIndex < targetIdx ? targetIdx - 1 : targetIdx;
+    u.splice(insertAt, 0, moved);
+    setEditData(u);
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  async function handleExportToSheets() {
+    setExporting(true);
+    setExportResult(null);
+    try {
+      const res = await fetch('/api/export-vc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vcs: contacts }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setExportResult({ error: data.error || `Export failed (HTTP ${res.status})` });
+      } else {
+        setExportResult({ url: data.url });
+        window.open(data.url, '_blank');
+      }
+    } catch (err) {
+      setExportResult({ error: String(err) });
+    } finally {
+      setExporting(false);
+    }
+  }
 
   function startEdit() { setEditData(contacts); setEditing(true); }
   function save() { onUpdate(editData); setEditing(false); }
@@ -363,6 +406,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
 
   const aliveCount = contacts.filter(c => c.aliveOrDead === 'Alive').length;
   const deadCount = contacts.filter(c => c.aliveOrDead === 'Dead').length;
+  const avoidCount = contacts.filter(c => c.aliveOrDead === 'Avoid').length;
 
   function sortByWave(list: VCContact[]) {
     return [...list].sort((a, b) => {
@@ -395,9 +439,10 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
           </div>
         </div>
         <div style={{ maxHeight: '70vh', overflow: 'auto', border: '1px solid #F5F0DC', borderRadius: 6 }}>
-          <table style={{ borderCollapse: 'collapse', fontSize: 12, minWidth: 1600 }}>
+          <table style={{ borderCollapse: 'collapse', fontSize: 12, minWidth: 1640 }}>
             <thead>
               <tr>
+                <th style={stickyTh({ width: 24, textAlign: 'center' })} title="Drag to reorder">⋮⋮</th>
                 <th style={stickyTh({ width: undefined })}>#</th>
                 <th style={stickyTh({ width: 50, textAlign: 'center' })}>Move</th>
                 {vcColumns.map(col => (
@@ -410,7 +455,40 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
             </thead>
             <tbody>
               {editData.map((c, idx) => (
-                <tr key={c.id} style={{ borderTop: '1px solid #F5F0DC' }}>
+                <tr
+                  key={c.id}
+                  onDragOver={e => { e.preventDefault(); if (dragIndex !== null) setDragOverIndex(idx); }}
+                  onDragLeave={() => { if (dragOverIndex === idx) setDragOverIndex(null); }}
+                  onDrop={e => { e.preventDefault(); handleDrop(idx); }}
+                  style={{
+                    borderTop: dragOverIndex === idx && dragIndex !== null && dragIndex !== idx
+                      ? '2px solid #2D5A3D'
+                      : '1px solid #F5F0DC',
+                    background: dragIndex === idx ? '#F0EBD8' : 'transparent',
+                    opacity: dragIndex === idx ? 0.5 : 1,
+                  }}
+                >
+                  <td style={{ padding: '2px 0', textAlign: 'center' }}>
+                    <span
+                      draggable
+                      onDragStart={e => {
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', String(idx));
+                        setDragIndex(idx);
+                      }}
+                      onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
+                      title="Drag to reorder"
+                      style={{
+                        cursor: 'grab',
+                        userSelect: 'none',
+                        display: 'inline-block',
+                        padding: '2px 4px',
+                        color: '#7A7A6E',
+                        fontSize: 13,
+                        lineHeight: 1,
+                      }}
+                    >⋮⋮</span>
+                  </td>
                   <td style={{ padding: '4px 8px', color: '#7A7A6E', fontSize: 11 }}>{idx + 1}</td>
                   <td style={{ padding: '2px 4px', textAlign: 'center' }}>
                     <button
@@ -440,6 +518,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                         >
                           <option value="Alive">Alive</option>
                           <option value="Dead">Dead</option>
+                          <option value="Avoid">Avoid</option>
                           <option value="">—</option>
                         </select>
                       ) : (
@@ -476,8 +555,62 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
     <div className="card" style={{ marginBottom: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>VC Pipeline ({contacts.length})</h3>
-        <button onClick={startEdit} className="btn-secondary" style={{ padding: '4px 12px', fontSize: 12 }}>Edit</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={handleExportToSheets}
+            disabled={exporting || contacts.length === 0}
+            className="btn-secondary"
+            style={{ padding: '4px 12px', fontSize: 12, opacity: exporting || contacts.length === 0 ? 0.6 : 1, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            title="Create a new Google Sheet with this VC list and share it via a public comment link"
+          >
+            {exporting ? (
+              <>
+                <span style={{ width: 10, height: 10, border: '2px solid #2D5A3D', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'helm-spin 0.7s linear infinite' }} />
+                Exporting…
+              </>
+            ) : '📤 Export & Share to Google Sheets'}
+          </button>
+          <button onClick={startEdit} className="btn-secondary" style={{ padding: '4px 12px', fontSize: 12 }}>Edit</button>
+        </div>
       </div>
+
+      {exportResult?.url && (
+        <div style={{
+          background: '#E8F5E9', border: '1px solid #2E7D32', borderRadius: 6,
+          padding: '10px 12px', marginBottom: 12, display: 'flex',
+          alignItems: 'center', gap: 10, flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: 12, color: '#2E7D32', fontWeight: 600 }}>✓ Sheet created &amp; shared (anyone with link can comment)</span>
+          <a href={exportResult.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2D5A3D', wordBreak: 'break-all', flex: 1, minWidth: 200 }}>
+            {exportResult.url}
+          </a>
+          <button
+            onClick={() => navigator.clipboard.writeText(exportResult.url!)}
+            className="btn-secondary"
+            style={{ padding: '2px 10px', fontSize: 11 }}
+          >
+            Copy link
+          </button>
+          <button
+            onClick={() => setExportResult(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#2E7D32', padding: 0, lineHeight: 1 }}
+          >×</button>
+        </div>
+      )}
+      {exportResult?.error && (
+        <div style={{
+          background: '#FFEBEE', border: '1px solid #C62828', borderRadius: 6,
+          padding: '10px 12px', marginBottom: 12, fontSize: 12, color: '#C62828',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
+        }}>
+          <span><strong>Export failed.</strong> {exportResult.error}</span>
+          <button
+            onClick={() => setExportResult(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#C62828', padding: 0, lineHeight: 1, flexShrink: 0 }}
+          >×</button>
+        </div>
+      )}
+      <style>{`@keyframes helm-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Summary badges and filter */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -504,6 +637,14 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
           color: filter === 'Dead' ? 'white' : '#1A1A1A',
         }}>
           Dead: {deadCount}
+        </button>
+        <button onClick={() => setFilter('Avoid')} style={{
+          padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+          border: filter === 'Avoid' ? '2px solid #6B4E8B' : '1px solid #D4C98A',
+          background: filter === 'Avoid' ? '#6B4E8B' : 'transparent',
+          color: filter === 'Avoid' ? 'white' : '#1A1A1A',
+        }}>
+          Avoid: {avoidCount}
         </button>
       </div>
 
@@ -532,7 +673,7 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                           <span style={{
                             display: 'inline-block', padding: '2px 8px', borderRadius: 12,
                             fontSize: 10, fontWeight: 600, color: 'white',
-                            background: val === 'Alive' ? '#2E7D32' : val === 'Dead' ? '#C62828' : '#B8B8A8',
+                            background: val === 'Alive' ? '#2E7D32' : val === 'Dead' ? '#C62828' : val === 'Avoid' ? '#6B4E8B' : '#B8B8A8',
                           }}>
                             {val || '—'}
                           </span>
