@@ -464,7 +464,9 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
                     borderTop: dragOverIndex === idx && dragIndex !== null && dragIndex !== idx
                       ? '2px solid #2D5A3D'
                       : '1px solid #F5F0DC',
-                    background: dragIndex === idx ? '#F0EBD8' : 'transparent',
+                    background: dragIndex === idx
+                      ? '#F0EBD8'
+                      : c.aliveOrDead === 'Avoid' ? '#F0EBF7' : 'transparent',
                     opacity: dragIndex === idx ? 0.5 : 1,
                   }}
                 >
@@ -664,7 +666,10 @@ function VCPipelineCard({ contacts, onUpdate }: { contacts: VCContact[]; onUpdat
             </thead>
             <tbody>
               {filtered.map(c => (
-                <tr key={c.id} style={{ borderTop: '1px solid #F5F0DC' }}>
+                <tr key={c.id} style={{
+                  borderTop: '1px solid #F5F0DC',
+                  background: c.aliveOrDead === 'Avoid' ? '#F0EBF7' : 'transparent',
+                }}>
                   {vcColumns.map(col => {
                     const val = c[col.key];
                     if (col.key === 'aliveOrDead') {
